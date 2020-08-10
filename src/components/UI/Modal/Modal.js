@@ -5,7 +5,10 @@ import Backdrop from "../Backdrop/Backdrop";
 class Modal extends Component {
   // We only want the modal to update if "show" changes to prevent unnecessary re-rendering every time an order detail changes and the modal isn't showing [perf]
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.show !== this.props.show;
+    return (
+      nextProps.show !== this.props.show ||
+      nextProps.children !== this.props.children
+    );
   }
 
   componentDidUpdate() {
