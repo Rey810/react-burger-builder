@@ -83,10 +83,13 @@ class ContactData extends Component {
             { value: "cheapest", displayValue: "Cheapest" },
           ],
         },
-        value: "",
+        valid: true,
+        validation: {},
+        value: "fastest",
       },
     },
     loading: false,
+    formIsValid: false,
   };
 
   orderHandler = (event) => {
@@ -155,7 +158,15 @@ class ContactData extends Component {
       updatedFormElement
     );
     updatedOrderForm[inputIdentifier] = updatedFormElement;
-    this.setState({ orderForm: updatedOrderForm });
+
+    // will be set to false when an input's validity is false
+    // then all other input checks will not change formIsValid as formIsValid will be false from the first input whose validation was false
+    let formIsValid = true;
+    for (let input in updatedOrderForm) {
+      formIsValid = updatedOrderForm[input].valid && formIsValid;
+    }
+
+    this.setState({ orderForm: updatedOrderForm, formIsValid: formIsValid });
   };
 
   render() {
@@ -180,7 +191,11 @@ class ContactData extends Component {
             touched={formElement.setup.touched}
           />
         ))}
-        <Button btnType="Success" clicked={this.orderHandler}>
+        <Button
+          btnType="Success"
+          clicked={this.orderHandler}
+          disabled={!this.state.formIsValid}
+        >
           ORDER
         </Button>
       </form>
