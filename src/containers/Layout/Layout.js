@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
+
 import classes from "./Layout.module.css";
 import Toolbar from "../../components/Navigation/Toolbar/Toolbar";
 import SideDrawer from "../../components/Navigation/SideDrawer/SideDrawer";
@@ -20,10 +22,14 @@ class Layout extends Component {
   render() {
     return (
       <>
-        <Toolbar open={this.sideDrawerToggleHandler} />
+        <Toolbar
+          open={this.sideDrawerToggleHandler}
+          isAuth={this.props.isAuthenticated}
+        />
         <SideDrawer
           open={this.state.showSideDrawer}
           closed={this.sideDrawerClosedHandler}
+          isAuth={this.props.isAuthenticated}
         />
         <main className={classes.Content}>{this.props.children}</main>
       </>
@@ -31,4 +37,12 @@ class Layout extends Component {
   }
 }
 
-export default Layout;
+// used in <NavigationItems> to update UI based on auth status
+const mapStateToProps = (state) => {
+  return {
+    // is true if there is a token
+    isAuthenticated: state.auth.token !== null,
+  };
+};
+
+export default connect(mapStateToProps)(Layout);

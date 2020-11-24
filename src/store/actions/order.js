@@ -24,12 +24,12 @@ export const purchaseBurgerStart = () => {
 
 // async
 // dispatch is possible due to 'redux-thunk'
-export const purchaseBurger = (orderData) => {
+export const purchaseBurger = (orderData, token) => {
   return (dispatch) => {
     dispatch(purchaseBurgerStart());
     // targets firebase endpoint (mongoDB-like structure)
     axios
-      .post("/orders.json", orderData)
+      .post(`/orders.json?auth=${token}`, orderData)
       .then((response) => {
         dispatch(purchaseBurgerSuccess(response.data.name, orderData));
       })
@@ -37,38 +37,39 @@ export const purchaseBurger = (orderData) => {
   };
 };
 
-
 export const purchaseInit = () => {
   return {
-    type: actionTypes.PURCHASE_INIT
-  }
-}
+    type: actionTypes.PURCHASE_INIT,
+  };
+};
 
 export const fetchOrdersSuccess = (orders) => {
   return {
     type: actionTypes.FETCH_ORDERS_SUCCESS,
-    orders: orders
-  }
-}
+    orders: orders,
+  };
+};
 
 export const fetchOrdersFail = (error) => {
   return {
     type: actionTypes.FETCH_ORDERS_FAIL,
-    error: error
-  }
-}
+    error: error,
+  };
+};
 
 export const fetchOrdersStart = () => {
   return {
-    type: actionTypes.FETCH_ORDERS_START
-  }
-}
+    type: actionTypes.FETCH_ORDERS_START,
+  };
+};
 
 // runs async code
-export const fetchOrders = () => {
-  return dispatch => {
-    dispatch(fetchOrdersStart())
-    axios.get("/orders.json")
+export const fetchOrders = (token) => {
+  return (dispatch) => {
+    dispatch(fetchOrdersStart());
+    // firebase token is added here as query param
+    axios
+      .get(`/orders.json?auth=${token}`)
       .then((response) => {
         console.log(response.data);
         const fetchedOrders = [];
@@ -76,10 +77,10 @@ export const fetchOrders = () => {
         for (let key in response.data) {
           fetchedOrders.push({ ...response.data[key], id: key });
         }
-        dispatch(fetchOrdersSuccess(fetchedOrders))
+        dispatch(fetchOrdersSuccess(fetchedOrders));
       })
       .catch((err) => {
-        dispatch(fetchOrdersFail(err))
+        dispatch(fetchOrdersFail(err));
       });
-  }
-}
+  };
+};
