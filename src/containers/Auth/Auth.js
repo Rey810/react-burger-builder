@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import { Redirect } from "react-router";
+
 import Input from "../../components/UI/Input/Input";
 import Button from "../../components/UI/Button/Button";
 import Spinner from "../../components/UI/Spinner/Spinner";
@@ -40,6 +42,12 @@ class Auth extends Component {
     },
     isSignUp: true,
   };
+
+  componentDidMount() {
+    if (!this.props.buildingBurger && this.props.authRedirectPath !== "/") {
+      this.props.onSetAuthRedirectPath();
+    }
+  }
 
   checkValidity(value, rules) {
     let isValid = true;
@@ -124,20 +132,25 @@ class Auth extends Component {
       />
     ));
 
-    if (this.props.loading){
-      form = <Spinner />
+    if (this.props.loading) {
+      form = <Spinner />;
     }
 
     let errorMessage = null;
 
     if (this.props.error) {
-      errorMessage = (
-        <p>{this.props.error.message}</p>
-      )
+      errorMessage = <p>{this.props.error.message}</p>;
     }
+
+    let authRedirect = null;
+    if (this.props.isAuthenticated) {
+      authRedirect = <Redirect to={this.props.authRedirectPath} />;
+    }
+
     return (
       <div className={classes.Auth}>
-      {errorMessage}
+        {authRedirect}
+        {errorMessage}
         <form onSubmit={this.submitHandler}>
           {form}
           <Button btnType="Success">Submit</Button>
@@ -151,17 +164,21 @@ class Auth extends Component {
 }
 
 // to get a slice of the global state
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     loading: state.auth.loading,
-    error: state.auth.error
-  }
-}
+    error: state.auth.error,
+    isAuthenticated: state.auth.token !== null,
+    buildingBurger: state.burgerBuilder.building,
+    authRedirectPath: state.auth.authRedirectPath,
+  };
+};
 
 const mapDispatchToProps = (dispatch) => {
   return {
     onAuth: (email, password, isSignUp) =>
       dispatch(actions.auth(email, password, isSignUp)),
+    onSetAuthRedirectPath: () => dispatch(actions.setAuthRedirectPath("/")),
   };
 };
 
