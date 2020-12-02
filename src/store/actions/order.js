@@ -73,7 +73,6 @@ export const fetchOrders = (token, userId) => {
     axios
       .get("/orders.json" + queryParams)
       .then((response) => {
-        console.log(response.data);
         const fetchedOrders = [];
         // data is transformed here before being passed on to reducer
         for (let key in response.data) {
