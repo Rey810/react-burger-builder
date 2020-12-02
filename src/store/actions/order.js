@@ -64,12 +64,14 @@ export const fetchOrdersStart = () => {
 };
 
 // runs async code
-export const fetchOrders = (token) => {
+export const fetchOrders = (token, userId) => {
   return (dispatch) => {
     dispatch(fetchOrdersStart());
-    // firebase token is added here as query param
+    const queryParams =
+      "?auth=" + token + `&orderBy="userId"&equalTo="${userId}"`;
+    // firebase token is added here as a query param
     axios
-      .get(`/orders.json?auth=${token}`)
+      .get("/orders.json" + queryParams)
       .then((response) => {
         console.log(response.data);
         const fetchedOrders = [];
